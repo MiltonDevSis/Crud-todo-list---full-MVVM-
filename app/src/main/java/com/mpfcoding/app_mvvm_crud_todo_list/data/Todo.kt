@@ -1,3 +1,12 @@
 package com.mpfcoding.app_mvvm_crud_todo_list.data
 
-data class Todo()
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
+data class Todo(
+    val title: String,
+    val description: String?,
+    val isDone: Boolean,
+    @PrimaryKey val id: Int? = null
+)
