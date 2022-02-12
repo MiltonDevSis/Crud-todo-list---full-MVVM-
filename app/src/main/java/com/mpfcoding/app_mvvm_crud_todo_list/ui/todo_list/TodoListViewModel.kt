@@ -1,5 +1,4 @@
 package com.mpfcoding.app_mvvm_crud_todo_list.ui.todo_list
-
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mpfcoding.app_mvvm_crud_todo_list.data.Todo
@@ -15,19 +14,19 @@ import javax.inject.Inject
 @HiltViewModel
 class TodoListViewModel @Inject constructor(
     private val repository: TodoRepository
-) : ViewModel() {
+): ViewModel() {
 
     val todos = repository.getTodos()
 
-    private val _uiEvents = Channel<UiEvent>()
-    val uiEvent = _uiEvents.receiveAsFlow()
+    private val _uiEvent =  Channel<UiEvent>()
+    val uiEvent = _uiEvent.receiveAsFlow()
 
     private var deletedTodo: Todo? = null
 
     fun onEvent(event: TodoListEvent) {
-        when (event) {
+        when(event) {
             is TodoListEvent.OnTodoClick -> {
-                sendUiEvent(UiEvent.Navigate(Routes.TODO_LIST + "?todoId=${event.todo.id}"))
+                sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO + "?todoId=${event.todo.id}"))
             }
             is TodoListEvent.OnAddTodoClick -> {
                 sendUiEvent(UiEvent.Navigate(Routes.ADD_EDIT_TODO))
@@ -35,7 +34,7 @@ class TodoListViewModel @Inject constructor(
             is TodoListEvent.OnUndoDeleteClick -> {
                 deletedTodo?.let { todo ->
                     viewModelScope.launch {
-                        repository.deleteTodo(todo)
+                        repository.insertTodo(todo)
                     }
                 }
             }
@@ -53,21 +52,17 @@ class TodoListViewModel @Inject constructor(
                 viewModelScope.launch {
                     repository.insertTodo(
                         event.todo.copy(
-                            isDone = event.isDone,
-
+                            isDone = event.isDone
                         )
                     )
                 }
             }
-            else -> {
-
-            }
         }
     }
 
-    fun sendUiEvent(event: UiEvent) {
+    private fun sendUiEvent(event: UiEvent) {
         viewModelScope.launch {
-            _uiEvents.send(event)
+            _uiEvent.send(event)
         }
     }
 }

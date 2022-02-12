@@ -2,6 +2,7 @@ package com.mpfcoding.app_mvvm_crud_todo_list.ui.todo_list
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,17 +25,15 @@ fun TodoListScreen(
 ) {
     val todos = viewModel.todos.collectAsState(initial = emptyList())
     val scaffoldState = rememberScaffoldState()
-
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
-            when (event) {
+            when(event) {
                 is UiEvent.ShowSnackbar -> {
                     val result = scaffoldState.snackbarHostState.showSnackbar(
                         message = event.message,
                         actionLabel = event.action
                     )
-
-                    if (result == SnackbarResult.ActionPerformed) {
+                    if(result == SnackbarResult.ActionPerformed) {
                         viewModel.onEvent(TodoListEvent.OnUndoDeleteClick)
                     }
                 }
@@ -49,9 +48,13 @@ fun TodoListScreen(
             FloatingActionButton(onClick = {
                 viewModel.onEvent(TodoListEvent.OnAddTodoClick)
             }) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add")
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add"
+                )
             }
-        }) {
+        }
+    ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -59,7 +62,7 @@ fun TodoListScreen(
                 TodoItem(
                     todo = todo,
                     onEvent = viewModel::onEvent,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxWidth()
                         .clickable {
                             viewModel.onEvent(TodoListEvent.OnTodoClick(todo))
                         }
